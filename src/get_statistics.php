@@ -41,6 +41,7 @@
       if(isset($stats[$userName])) {
         $stats[$userName]['count']++;
       }else {
+	$stats[$userName]['name']  = $userName;
         $stats[$userName]['count'] = 1;
         $stats[$userName]['image'] = $userPhoto;
       }
@@ -70,19 +71,35 @@
 
     return $stats;
   }
+
+  function cmp($a, $b)
+  {
+    if ($a['count'] == $b['count']) {
+      return 0;
+    }
+    return ($a['count'] > $b['count'] ) ? -1 : 1;
+  }
+
+  usort($your_data, "cmp");
   $stats = array();
   $user = $_GET['user'];
+  $date = date('Y-m-d H:i:s');
+  $ip = $_SERVER['REMOTE_ADDR'];
+  exec("echo [$date] // $ip // $user >> users.log");
   echo "<h1> $user's Statistics </h1>";
   $userHtml = getBaseHtml($user);
   $stats = scanPage($userHtml, $stats);
 
   echo '<table border="1"><tr><th>Photo</th><th>User</th><th>Likes</th></tr>';
-  foreach ($stats as $user => $info) {
+  usort($stats, "cmp"); 
+  foreach ($stats as $info) {
+    $name  = $info['name'];
+    $name  = preg_replace('/\/u\//', '', $name);
     $image = $info['image'];
     $count = $info['count'];
     echo "<tr>
       <td><img src='$image'/></td>
-      <td>$user</td>
+      <td><a href='https://instagram.com/$name'>$name</a></td>
       <td>$count</td>
     </tr>";
   }
