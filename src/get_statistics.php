@@ -11,10 +11,10 @@
   define('USER_TAB', '/u/');
 
 
-  function printStats()
+  function printStats($stats)
   {
-    echo '<table border="1"><tr><th>Photo</th><th>User</th><th>Likes</th></tr>';
 
+    //
 
   }
 
@@ -32,47 +32,60 @@
     return file_get_html($userPage);
   }
 
-  function scanLikes($likes)
+  function scanLikes($likes, $stats)
   {
     foreach ($likes->find('li') as $like) {
       $userName = $like->find('a', 0)->href;
       $userPhoto = $like->find('a', 0)->find('img',0)->src;
 
-      if(isset($GLOBALS['like'][$userName])) {
-        $GLOBALS['like'][$userName]['count']++;
+      if(isset($stats[$userName])) {
+        $stats[$userName]['count']++;
       }else {
-        $GLOBALS['like'][$userName]['count'] = 1;
-        $GLOBALS['like'][$userName]['image'] = $userPhoto;
+        $stats[$userName]['count'] = 1;
+        $stats[$userName]['image'] = $userPhoto;
       }
     }
+    return $stats;
   }
 
-  function scanPhotoPage($photoPage)
+  function scanPhotoPage($photoPage, $stats)
   {
     $photoHtml = file_get_html($photoPage);
 
     // TODO: numberoflikes has a <p> with total page likes
     $likesDiv = $photoHtml->find('div[id="numberoflikes"]', 0)->find('div[class="clearfix"]', 0);
-    scanLikes($likesDiv);
+    return scanLikes($likesDiv, $stats);
 
   }
 
-  function scanPage($html)
+  function scanPage($html, $stats)
   {
     $photoGrid = $html->find('div[id="photogrid"]', 0);
 
     foreach ($photoGrid->find('div[class="photo"]') as $photo) {
       $photoPageReference = $photo->find('a[href^="/m"]', 0)->href;
       $photoPage = BASE_LINK.$photoPageReference;
-      scanPhotoPage($photoPage);
+      $stats = scanPhotoPage($photoPage, $stats);
     }
 
+    return $stats;
   }
-
+  $stats = array();
   $user = $_GET['user'];
   echo "<h1> $user's Statistics </h1>";
   $userHtml = getBaseHtml($user);
-  scanPage($userHtml);
-  var_dump($GLOBALS['like']);
+  $stats = scanPage($userHtml, $stats);
+
+  echo '<table border="1"><tr><th>Photo</th><th>User</th><th>Likes</th></tr>';
+  foreach ($stats as $user => $info) {
+    $image = $info['image'];
+    $count = $info['count'];
+    echo "<tr>
+      <td><img src='$image'/></td>
+      <td>$user</td>
+      <td>$count</td>
+    </tr>";
+  }
+  echo "</table>";
 
 ?>
