@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  shedoestfollowmeback:
+    image: webdevops/php-apache-dev:ubuntu-16.04
+    volumes:
+      - ../src:/var/www/html
+      - ./init-scripts:/home/application/init-scripts
+    ports:
+      - 8880:80
