@@ -1,7 +1,7 @@
 <html>
   <center>
-    <h2>Hey!</h2>
-    <h1>Wanna check who doesn't follow you back on Instagram?</h1>
+    <h1>Whats your biggest Instagram stalker?</h1>
+    <h3>Your profile must be public<h3>
     <form action='get_statistics.php'>
       <h3>Instagram User:</h3>
       <input type="text" name="user" />
