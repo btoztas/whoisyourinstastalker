@@ -90,8 +90,7 @@
     }
     return ($a['count'] > $b['count'] ) ? -1 : 1;
   }
-
-  usort($your_data, "cmp");
+	    
   $stats = array();
   $user = $_GET['user'];
   $date = date('Y-m-d H:i:s');
