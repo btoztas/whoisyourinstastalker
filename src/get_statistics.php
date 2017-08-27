@@ -13,9 +13,20 @@
 
   function printStats($stats)
   {
-
-    //
-
+    echo '<table border="1"><tr><th>Photo</th><th>User</th><th>Likes</th></tr>';
+    usort($stats, "cmp"); 
+    foreach ($stats as $info) {
+      $name  = $info['name'];
+      $name  = preg_replace('/\/u\//', '', $name);
+      $image = $info['image'];
+      $count = $info['count'];
+      echo "<tr>
+        <td><img src='$image'/></td>
+        <td><a href='https://instagram.com/$name'>$name</a></td>
+        <td>$count</td>
+      </tr>";
+    } 
+    echo "</table>";
   }
 
   function getNextPageHtml()
@@ -85,24 +96,11 @@
   $user = $_GET['user'];
   $date = date('Y-m-d H:i:s');
   $ip = $_SERVER['REMOTE_ADDR'];
+  
   exec("echo [$date] // $ip // $user >> users.log");
   echo "<h1> $user's Statistics </h1>";
+  
   $userHtml = getBaseHtml($user);
   $stats = scanPage($userHtml, $stats);
-
-  echo '<table border="1"><tr><th>Photo</th><th>User</th><th>Likes</th></tr>';
-  usort($stats, "cmp"); 
-  foreach ($stats as $info) {
-    $name  = $info['name'];
-    $name  = preg_replace('/\/u\//', '', $name);
-    $image = $info['image'];
-    $count = $info['count'];
-    echo "<tr>
-      <td><img src='$image'/></td>
-      <td><a href='https://instagram.com/$name'>$name</a></td>
-      <td>$count</td>
-    </tr>";
-  }
-  echo "</table>";
-
+  printStats($stats);
 ?>
